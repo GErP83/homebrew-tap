@@ -20,3 +20,5 @@ class HomebrewTap < Formula
   # brew install GErP83/homebrew-tap
 
   # brew uninstall homebrew-tap
+
+  # brew list --formula
