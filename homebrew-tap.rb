@@ -10,3 +10,13 @@ class HomebrewTap < Formula
       bin.install '.build/release/testify' 
     end
   end
+
+
+  # brew install ./homebrew-tap.rb
+
+  # brew tap GErP83/homebrew-tap
+  # brew install homebrew-tap
+
+  # brew install GErP83/homebrew-tap
+
+  # brew uninstall homebrew-tap
