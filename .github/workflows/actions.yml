@@ -3,7 +3,8 @@ name: Build & Release Swift Packages
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*'       # v1.2.3, v0.0.1
+      - '[0-9]*'   # 1.2.3, 0.0.1
 
 jobs:
   build-release:
@@ -19,8 +20,7 @@ jobs:
       - name: Extract version from Git tag
         id: version
         run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION="${TAG#v}"
+          VERSION=${GITHUB_REF#refs/tags/}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
