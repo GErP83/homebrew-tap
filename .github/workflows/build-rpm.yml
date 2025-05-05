@@ -10,7 +10,7 @@ jobs:
 
     env:
       NAME: test                      # Change if your project is named differently
-      VERSION: 1.0.0                  # You can also extract this from git tag if desired
+      VERSION: 0.0.1                  # You can also extract this from git tag if desired
 
     steps:
       - name: Checkout source

@@ -5,7 +5,7 @@ Summary:        Sample Swift RPM
 
 License:        MIT
 URL:            https://example.com/test
-Source0:        %{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 #BuildRequires:  swift-lang
 #Requires:       swift-lang

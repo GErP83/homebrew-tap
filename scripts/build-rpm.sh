@@ -5,7 +5,6 @@ set -e
 
 NAME="$1"
 VERSION="$2"
-RELEASE="1"
 TARBALL="${NAME}-${VERSION}.tar.gz"
 TOPDIR="$HOME/rpmbuild"
 
