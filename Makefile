@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-.PHONY: all clean rpm
+.PHONY: all clean rpm deb
 
 baseUrl = https://raw.githubusercontent.com/BinaryBirds/github-workflows/refs/heads/main/scripts
 
@@ -26,14 +26,24 @@ uninstall:
 	rm /usr/local/bin/testify
 
 
-rpm:
+# Generic check to ensure required args are passed
+check-vars:
 	@if [ -z "$(NAME)" ] || [ -z "$(VERSION)" ]; then \
-	  echo "Usage: make rpm NAME=your-lib VERSION=1.0.0"; \
+	  echo "Usage: make <target> NAME=your-lib VERSION=1.0.0"; \
 	  exit 1; \
 	fi
-	@echo "Invoking build-rpm.sh with NAME=$(NAME) VERSION=$(VERSION)"
+
+all: rpm deb
+
+rpm: check-vars
+	@echo "➡️  Building RPM for $(NAME) version $(VERSION)"
 	./scripts/build-rpm.sh $(NAME) $(VERSION)
 
+deb: check-vars
+	@echo "➡️  Building DEB for $(NAME) version $(VERSION)"
+	./scripts/build-deb.sh $(NAME) $(VERSION)
+
 clean:
-	@echo "Cleaning RPM build artifacts..."
+	@echo "🧹 Cleaning build artifacts..."
 	rm -rf ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+	rm -rf build-deb
