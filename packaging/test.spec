@@ -1,11 +1,11 @@
 Name:           test
-Version:        1.0.0
+Version:        0.0.1
 Release:        1%{?dist}
 Summary:        Sample Swift RPM
 
 License:        MIT
 URL:            https://example.com/test
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{version}.tar.gz
 
 #BuildRequires:  swift-lang
 #Requires:       swift-lang
