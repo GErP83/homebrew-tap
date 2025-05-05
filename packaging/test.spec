@@ -7,8 +7,8 @@ License:        MIT
 URL:            https://example.com/test
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires:  swift-lang
-Requires:       swift-lang
+#BuildRequires:  swift-lang
+#Requires:       swift-lang
 
 %description
 Test Swift library packaged as RPM.
