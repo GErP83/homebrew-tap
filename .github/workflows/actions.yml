@@ -53,5 +53,6 @@ jobs:
           files: |
             release/*.rpm
             release/*.deb
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
