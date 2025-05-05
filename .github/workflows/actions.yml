@@ -46,14 +46,13 @@ jobs:
           cp build-deb/*.deb release/ || echo "No DEB found"
 
       - name: Upload packages to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           name: "Release ${{ steps.version.outputs.version }}"
           tag_name: ${{ github.ref }}
           files: |
             release/*.rpm
             release/*.deb
-          fail_on_unmatched_files: false
-          generate_release_notes: true
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
