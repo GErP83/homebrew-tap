@@ -32,7 +32,7 @@ jobs:
           make rpm NAME=$NAME VERSION=$VERSION
 
       - name: Upload RPM as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NAME }}-rpm
           path: ~/rpmbuild/RPMS/**/*.rpm
