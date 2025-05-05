@@ -1,0 +1,38 @@
+name: Build Swift RPM
+
+on:
+  push:      # 🔁 Run on every push to any branch
+  workflow_dispatch:
+
+jobs:
+  build-rpm:
+    runs-on: ubuntu-latest
+
+    env:
+      NAME: test                      # Change if your project is named differently
+      VERSION: 1.0.0                  # You can also extract this from git tag if desired
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install RPM & Swift dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y rpm curl git clang libcurl4-openssl-dev libssl-dev libatomic1
+          curl -O https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          tar -xzf swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          echo "$(pwd)/swift-5.9-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+
+      - name: Verify Swift is installed
+        run: swift --version
+
+      - name: Build RPM using Makefile
+        run: |
+          make rpm NAME=$NAME VERSION=$VERSION
+
+      - name: Upload RPM as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.NAME }}-rpm
+          path: ~/rpmbuild/RPMS/**/*.rpm
