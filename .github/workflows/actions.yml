@@ -1,37 +1,57 @@
-#name: Actions
+name: Build & Release Swift Packages
 
-#on:
-#  pull_request:
-#    branches:
-#    - main
+on:
+  push:
+    tags:
+      - 'v*'
 
-#jobs:
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
 
-#  bb_checks:
-#    name: BB Checks
-#    uses: BinaryBirds/github-workflows/.github/workflows/extra_soundness.yml@main
-#    with:
-#      local_swift_dependencies_check_enabled : true
+    env:
+      NAME: test
 
-#  swiftlang_checks:
-#    name: Swiftlang Checks
-#    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@main
-#    with:
-#      license_header_check_project_name: "Testify"
-#      format_check_enabled : true
-#      broken_symlink_check_enabled : true
-#      unacceptable_language_check_enabled : true
-#      api_breakage_check_enabled : false
-#      docs_check_enabled : false
-#      license_header_check_enabled : false
-#      shell_check_enabled : false
-#      yamllint_check_enabled : false
-#      python_lint_check_enabled : false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-#  swiftlang_tests:
-#    name: Swiftlang Tests
-#    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@main
-#    with:
-#      enable_windows_checks : false
-#      linux_build_command: "swift test --parallel"
-#      linux_exclude_swift_versions: "[{\"swift_version\": \"5.8\"}, {\"swift_version\": \"5.10\"}, {\"swift_version\": \"nightly\"}, {\"swift_version\": \"nightly-main\"}, {\"swift_version\": \"nightly-6.0\"}]"
+      - name: Extract version from Git tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install Swift and packaging tools
+        run: |
+          sudo apt update
+          sudo apt install -y rpm dpkg-dev curl git clang libcurl4-openssl-dev libssl-dev libatomic1
+          curl -O https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          tar -xzf swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          echo "$(pwd)/swift-5.9-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+          chmod +x scripts/*.sh
+
+      - name: Build RPM
+        run: ./scripts/build-rpm.sh $NAME $VERSION
+
+      - name: Build DEB
+        run: ./scripts/build-deb.sh $NAME $VERSION
+
+      - name: Collect packages
+        run: |
+          mkdir release
+          cp ~/rpmbuild/RPMS/**/*.rpm release/ || echo "No RPM found"
+          cp build-deb/*.deb release/ || echo "No DEB found"
+
+      - name: Upload packages to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Release ${{ steps.version.outputs.version }}"
+          tag_name: ${{ github.ref }}
+          files: |
+            release/*.rpm
+            release/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
