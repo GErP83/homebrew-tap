@@ -45,29 +45,18 @@ jobs:
           cp ~/rpmbuild/RPMS/**/*.rpm release/
           cp build-deb/*.deb release/
 
-#      - name: Create GitHub Release if not exists
-#        uses: actions/github-script@v7
-#        with:
-#          github-token: ${{ secrets.GH_TAP }}
-#          script: |
-#            const tag = context.ref.replace('refs/tags/', '');
-#            const releases = await github.rest.repos.listReleases({
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#            });
-#            const exists = releases.data.find(r => r.tag_name === tag);
-#            if (!exists) {
-#              await github.rest.repos.createRelease({
-#                owner: context.repo.owner,
-#                repo: context.repo.repo,
-#                tag_name: tag,
-#                name: `Release ${tag}`,
-#                generate_release_notes: true
-#              });
-#            }
+      - name: Get release ID for current tag
+        id: release
+        run: |
+          TAG="${{ github.ref_name }}"
+          ID=$(gh release view "$TAG" --json id -q ".id")
+          echo "id=$ID" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload assets to release
         uses: AButler/upload-release-assets@v3.0
         with:
           files: release/*.rpm;release/*.deb
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-id: ${{ steps.release.outputs.id }}
