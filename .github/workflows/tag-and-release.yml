@@ -13,9 +13,14 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # ensures full history and tag visibility
+
+      - name: Configure Git identity (SwiftLint style)
+        run: |
+            git config user.name "gerp83"
+            git config user.email "gurrka@gmail.com"
 
       - name: Create and push Git tag
         env:
@@ -23,9 +28,6 @@ jobs:
         run: |
           VERSION=${{ github.event.inputs.version }}
           echo "🔖 Creating tag: $VERSION"
-
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
 
           git tag "$VERSION"
           git push "https://x-access-token:${GH_TAP}@github.com/${{ github.repository }}" "$VERSION"
