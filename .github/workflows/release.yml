@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NAME: my-swift-lib
+      NAME: test
 
     steps:
       - name: Checkout code
