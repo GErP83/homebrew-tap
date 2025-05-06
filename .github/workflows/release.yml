@@ -1,0 +1,73 @@
+name: Build & Publish Swift Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      NAME: my-swift-lib
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract version from tag
+        id: extract
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install Swift & packaging tools
+        run: |
+          sudo apt update
+          sudo apt install -y rpm dpkg-dev curl git clang libcurl4-openssl-dev libssl-dev libatomic1
+          curl -O https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          tar -xzf swift-5.9-RELEASE-ubuntu22.04.tar.gz
+          echo "$(pwd)/swift-5.9-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+          chmod +x scripts/*.sh
+
+      - name: Build RPM
+        run: ./scripts/build-rpm.sh $NAME $VERSION
+
+      - name: Build DEB
+        run: ./scripts/build-deb.sh $NAME $VERSION
+
+      - name: Collect packages
+        run: |
+          mkdir release
+          cp ~/rpmbuild/RPMS/**/*.rpm release/
+          cp build-deb/*.deb release/
+
+      - name: Create GitHub Release if not exists
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const exists = releases.data.find(r => r.tag_name === tag);
+            if (!exists) {
+              await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: tag,
+                name: `Release ${tag}`,
+                generate_release_notes: true
+              });
+            }
+
+      - name: Upload assets to release
+        uses: AButler/upload-release-assets@v3.0
+        with:
+          files: release/*.rpm;release/*.deb
+          repo-token: ${{ secrets.GH_PAT }}
