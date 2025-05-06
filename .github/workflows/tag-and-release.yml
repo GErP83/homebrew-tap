@@ -17,11 +17,6 @@ jobs:
         with:
           fetch-depth: 0  # ensures full history and tag visibility
 
-      - name: Configure Git identity (SwiftLint style)
-        run: |
-            git config user.name "GErP83"
-            git config user.email "gurrka@gmail.com"
-
       - name: Create and push Git tag
         env:
           GH_TAP: ${{ secrets.GH_TAP }}
@@ -29,5 +24,7 @@ jobs:
           VERSION=${{ github.event.inputs.version }}
           echo "🔖 Creating tag: $VERSION"
 
+          git config user.name "GErP83"
+          git config user.email "gurrka@gmail.com"
           git tag "$VERSION"
           git push "https://x-access-token:${GH_TAP}@github.com/${{ github.repository }}" "$VERSION"
