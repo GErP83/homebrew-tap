@@ -19,7 +19,7 @@ jobs:
 
       - name: Configure Git identity (SwiftLint style)
         run: |
-            git config user.name "gerp83"
+            git config user.name "GErP83"
             git config user.email "gurrka@gmail.com"
 
       - name: Create and push Git tag
