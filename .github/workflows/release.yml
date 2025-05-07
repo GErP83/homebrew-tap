@@ -37,8 +37,24 @@ jobs:
       - name: Build RPM
         run: ./scripts/build-rpm.sh $VERSION
 
+      - name: Verify RPM
+        run: |
+          RPM="release/toucan-${VERSION}.x86_64.rpm"
+          echo "🧪 Verifying $RPM"
+          rpm -Kv "$RPM"
+          rpm -qp "$RPM"
+          echo "✅ RPM passed verification"
+
       - name: Build DEB
         run: ./scripts/build-deb.sh $VERSION
+
+      - name: Verify DEB
+        run: |
+          DEB="build-deb/toucan_${VERSION}_amd64.deb"
+          echo "🧪 Verifying $DEB"
+          dpkg-deb --info "$DEB"
+          dpkg-deb --contents "$DEB"
+          echo "✅ DEB passed verification"
 
       - name: Collect and verify packages
         run: |
@@ -91,6 +107,13 @@ jobs:
         run: |
           chmod +x scripts/build-pkg.sh
           ./scripts/build-pkg.sh $VERSION
+
+      - name: Verify .pkg
+        run: |
+          PKG="release/toucan-${VERSION}.pkg"
+          echo "🧪 Verifying $PKG"
+          pkgutil --payload-files "$PKG"
+          echo "✅ PKG passed verification"
 
       - name: Upload .pkg to release
         uses: AButler/upload-release-assets@v3.0
