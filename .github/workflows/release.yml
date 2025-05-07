@@ -92,11 +92,11 @@ jobs:
         run: |
           export PATH="/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin:$PATH"
           swift build -c release
-          mkdir -p pkg-root/usr/local/bin
-          cp .build/release/$NAME pkg-root/usr/local/bin/
-
+          
       - name: Create .pkg installer
         run: |
+          mkdir -p pkg-root/usr/local/bin
+          cp .build/release/testify pkg-root/usr/local/bin/
           pkgbuild \
             --identifier com.example.$NAME \
             --version "$VERSION" \
