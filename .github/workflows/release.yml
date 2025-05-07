@@ -108,6 +108,6 @@ jobs:
       - name: Upload .pkg to release
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: *.pkg
+          files: "*.pkg"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
