@@ -7,8 +7,10 @@ on:
       - '[0-9]*'
 
 jobs:
-  release:
+  build-linux:
     runs-on: ubuntu-latest
+    container:
+      image: swift:6.0 
     permissions:
       contents: write
 
@@ -26,13 +28,10 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Install Swift & packaging tools
+      - name: Install packaging tools
         run: |
-          sudo apt update
-          sudo apt install -y rpm dpkg-dev curl git clang libcurl4-openssl-dev libssl-dev libatomic1
-          curl -O https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz
-          tar -xzf swift-5.9-RELEASE-ubuntu22.04.tar.gz
-          echo "$(pwd)/swift-5.9-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+          apt-get update
+          apt-get install -y rpm dpkg-dev curl git clang libcurl4-openssl-dev libssl-dev libatomic1
           chmod +x scripts/*.sh
 
       - name: Build RPM
@@ -59,5 +58,56 @@ jobs:
         uses: AButler/upload-release-assets@v3.0
         with:
           files: release/*.rpm;release/*.deb
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+
+  build-macos:
+    runs-on: macos-latest
+    needs: build-linux
+    permissions:
+      contents: write
+
+    env:
+      NAME: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install Swift 6.0
+        run: |
+          curl -L https://download.swift.org/swift-6.0-release/xcode/swift-6.0-RELEASE/swift-6.0-RELEASE-osx.pkg -o swift.pkg
+          sudo installer -pkg swift.pkg -target /
+          export PATH="/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin:$PATH"
+          swift --version
+    
+      - name: Build binary with Swift 6.0
+        run: |
+          export PATH="/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin:$PATH"
+          swift build -c release
+          mkdir -p pkg-root/usr/local/bin
+          cp .build/release/$NAME pkg-root/usr/local/bin/
+
+      - name: Create .pkg installer
+        run: |
+          pkgbuild \
+            --identifier com.example.$NAME \
+            --version "$VERSION" \
+            --install-location /usr/local/bin \
+            --root pkg-root \
+            "$NAME-$VERSION.pkg"
+          echo "Created package: $NAME-$VERSION.pkg"
+
+      - name: Upload .pkg to release
+        uses: AButler/upload-release-assets@v3.0
+        with:
+          files: *.pkg
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
