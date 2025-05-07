@@ -1,16 +1,16 @@
 Name:           toucan
 Version:        %{ver}
 Release:        1
-Summary:        Toucan CLI tools
+Summary:        SSG tools
 
 License:        MIT
-URL:            https://example.com/toucan
+URL:            https://github.com/toucansites/toucan
 Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      x86_64
 
 %description
-Toucan CLI tools precompiled in Swift and installed to /usr/local/bin.
+Toucan is a static site generator written in Swift.
 
 %prep
 %setup -q
