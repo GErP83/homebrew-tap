@@ -1,32 +1,51 @@
 #!/bin/bash
+# Usage: ./build-pkg.sh <VERSION>
+
 set -e
 
-NAME=$1
-VERSION=$2
+VERSION="$1"
 
-echo "📦 Creating .pkg for $NAME version $VERSION"
+if [ -z "$VERSION" ]; then
+  echo "Usage: $0 <VERSION>"
+  exit 1
+fi
+
+echo "📦 Creating .pkg for version $VERSION"
 
 # Paths
 ROOT_DIR=$(pwd)
 PKGROOT="$ROOT_DIR/pkg-root"
 RELEASE_DIR="$ROOT_DIR/release"
-PKGFILE="$RELEASE_DIR/${NAME}-${VERSION}.pkg"
+PKGFILE="$RELEASE_DIR/toucan-${VERSION}.pkg"
+BIN_DIR=".build/release"
 
-# Prepare install root
+# Find executables
+EXECUTABLES=$(find "$BIN_DIR" -maxdepth 1 -type f -perm +111)
+
+if [ -z "$EXECUTABLES" ]; then
+  echo "❌ No executable binaries found in $BIN_DIR"
+  exit 1
+fi
+
+# Prepare packaging structure
+rm -rf "$PKGROOT"
 mkdir -p "$PKGROOT/usr/local/bin"
-
-# TODO replace testify here
-cp ".build/release/testify" "$PKGROOT/usr/local/bin/"
-
-# Create release dir if needed
 mkdir -p "$RELEASE_DIR"
 
-# Build the package
+# Copy all executables and ensure they are executable
+for BIN in $EXECUTABLES; do
+  BASENAME=$(basename "$BIN")
+  cp "$BIN" "$PKGROOT/usr/local/bin/$BASENAME"
+  chmod +x "$PKGROOT/usr/local/bin/$BASENAME"
+  echo "✅ Added $BASENAME"
+done
+
+# Build .pkg
 pkgbuild \
-  --identifier "com.example.${NAME}" \
+  --identifier "com.yourcompany.${NAME}" \
   --version "$VERSION" \
   --install-location /usr/local/bin \
   --root "$PKGROOT" \
   "$PKGFILE"
 
-echo "✅ Package created at: $PKGFILE"
+echo "🎉 Package created at: $PKGFILE"
