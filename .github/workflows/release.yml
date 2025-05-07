@@ -35,10 +35,10 @@ jobs:
           chmod +x scripts/*.sh
 
       - name: Build RPM
-        run: ./scripts/build-rpm.sh $NAME $VERSION
+        run: ./scripts/build-rpm.sh $VERSION
 
       - name: Build DEB
-        run: ./scripts/build-deb.sh $NAME $VERSION
+        run: ./scripts/build-deb.sh $VERSION
 
       - name: Collect packages
         run: |
