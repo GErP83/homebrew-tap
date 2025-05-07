@@ -1,6 +1,6 @@
 Name:           toucan
 Version:        %{ver}
-Release:        %{ver}
+Release:        1
 Summary:        Toucan CLI tools
 
 License:        MIT
@@ -30,5 +30,5 @@ cp -a usr/local/bin/* %{buildroot}/usr/local/bin/
 #%doc README.md
 
 %changelog
-* Mon May 05 2025 Developer <dev@example.com> - %{ver}-%{ver}.x86_64
+* Mon May 05 2025 Developer <dev@example.com> - %{ver}.x86_64
 - Initial precompiled multi-binary CLI package installed to /usr/local/bin
