@@ -7,7 +7,7 @@ License:        MIT
 URL:            https://example.com/toucan
 Source0:        %{name}-%{version}.tar.gz
 
-BuildArch:      noarch
+BuildArch:      x86_64
 
 %description
 Toucan CLI tools precompiled in Swift and installed to /usr/local/bin.
@@ -30,5 +30,5 @@ cp -a usr/local/bin/* %{buildroot}/usr/local/bin/
 #%doc README.md
 
 %changelog
-* Mon May 05 2025 Developer <dev@example.com> - %{ver}-%{ver}
+* Mon May 05 2025 Developer <dev@example.com> - %{ver}-%{ver}.x86_64
 - Initial precompiled multi-binary CLI package installed to /usr/local/bin
