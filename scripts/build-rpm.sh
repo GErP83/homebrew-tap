@@ -22,7 +22,7 @@ mkdir -p "$TOPDIR"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT
 
-APP_ROOT="$WORKDIR/${NAME}-${VERSION}/usr/lib/$NAME"
+APP_ROOT="$WORKDIR/${NAME}-${VERSION}/usr/local/bin"
 mkdir -p "$APP_ROOT"
 
 EXECUTABLES=$(find -L "$BIN_DIR" -type f -perm -111)
@@ -32,10 +32,8 @@ if [ -z "$EXECUTABLES" ]; then
 fi
 
 for BIN in $EXECUTABLES; do
-  BASENAME=$(basename "$BIN")
-  cp "$BIN" "$APP_ROOT/$BASENAME"
-  chmod +x "$APP_ROOT/$BASENAME"
-  echo "✅ Added $BASENAME"
+  cp "$BIN" "$APP_ROOT/"
+  chmod +x "$APP_ROOT/$(basename "$BIN")"
 done
 
 tar -czf "$TOPDIR/SOURCES/$TARBALL" -C "$WORKDIR" "${NAME}-${VERSION}"
