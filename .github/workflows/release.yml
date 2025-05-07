@@ -97,17 +97,20 @@ jobs:
         run: |
           mkdir -p pkg-root/usr/local/bin
           cp .build/release/testify pkg-root/usr/local/bin/
+          mkdir -p release
+          mkdir -p release
           pkgbuild \
             --identifier com.example.$NAME \
             --version "$VERSION" \
             --install-location /usr/local/bin \
             --root pkg-root \
-            "$NAME-$VERSION.pkg"
-          echo "Created package: $NAME-$VERSION.pkg"
+            "release/$NAME-$VERSION.pkg"
+          echo "Contents of release/:"
+          ls -lh release
 
       - name: Upload .pkg to release
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: "*.pkg"
+          files: release/*.pkg
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
