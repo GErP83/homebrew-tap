@@ -39,7 +39,7 @@ jobs:
 
       - name: Verify RPM
         run: |
-          RPM="release/toucan-${VERSION}.x86_64.rpm"
+          RPM="release/toucan-${VERSION}-1.x86_64.rpm"
           echo "🧪 Verifying $RPM"
           rpm -Kv "$RPM"
           rpm -qp "$RPM"
