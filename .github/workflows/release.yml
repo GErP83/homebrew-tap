@@ -48,8 +48,6 @@ jobs:
       - name: Build DEB
         run: ./scripts/build-deb.sh $VERSION
 
-
-        # toucan-0.0.1.amd64.deb
       - name: Verify DEB
         run: |
           DEB="build-deb/toucan-${VERSION}.amd64.deb"

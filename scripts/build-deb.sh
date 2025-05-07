@@ -41,8 +41,8 @@ cat > "$PKG_ROOT/DEBIAN/control" <<EOF
 Package: $NAME
 Version: $VERSION
 Architecture: $ARCH
-Maintainer: Your Name <info@binarybirds.com>
-Description: $NAME - Swift CLI tools
+Maintainer: binarybirds <info@binarybirds.com>
+Description: $NAME - Toucan is a static site generator written in Swift.
 Section: utils
 Priority: optional
 EOF
