@@ -1,9 +1,8 @@
 #!/bin/bash
-# Usage: ./build-pkg.sh <VERSION>
-
 set -e
 
 VERSION="$1"
+NAME="toucan"
 
 if [ -z "$VERSION" ]; then
   echo "Usage: $0 <VERSION>"
@@ -16,11 +15,11 @@ echo "📦 Creating .pkg for version $VERSION"
 ROOT_DIR=$(pwd)
 PKGROOT="$ROOT_DIR/pkg-root"
 RELEASE_DIR="$ROOT_DIR/release"
-PKGFILE="$RELEASE_DIR/toucan-${VERSION}.pkg"
+PKGFILE="$RELEASE_DIR/${NAME}-${VERSION}.pkg"
 BIN_DIR=".build/release"
 
 # Find executables
-EXECUTABLES=$(find "$BIN_DIR" -maxdepth 1 -type f -perm +111)
+EXECUTABLES=$(find -L "$BIN_DIR" -type f -perm -111)
 
 if [ -z "$EXECUTABLES" ]; then
   echo "❌ No executable binaries found in $BIN_DIR"
@@ -42,7 +41,7 @@ done
 
 # Build .pkg
 pkgbuild \
-  --identifier "com.yourcompany.${NAME}" \
+  --identifier "com.binarybirds.${NAME}" \
   --version "$VERSION" \
   --install-location /usr/local/bin \
   --root "$PKGROOT" \
