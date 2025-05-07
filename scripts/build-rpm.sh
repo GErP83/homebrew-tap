@@ -58,7 +58,6 @@ FINAL_RPM=$(find "$TOPDIR/RPMS" -type f -name "*.rpm" | head -n1)
 # Clean and copy to release
 [ -e release ] && [ ! -d release ] && rm release
 mkdir -p release
-RELEASE_PATH="release/${NAME}-${VERSION}.x86_64.rpm"
-cp "$FINAL_RPM" "$RELEASE_PATH"
+cp "$FINAL_RPM" release/
 
-echo "🎉 RPM created: $RELEASE_PATH"
+echo "🎉 RPM created: $FINAL_RPM"
