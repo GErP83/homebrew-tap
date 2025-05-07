@@ -42,20 +42,23 @@ done
 # Optionally copy docs
 cp -f README.md LICENSE "$WORKDIR/${NAME}-${VERSION}/" 2>/dev/null || echo "ℹ️ Skipping docs (optional)"
 
-# Create tarball for RPM
+# Create tarball
 tar -czf "$TOPDIR/SOURCES/$TARBALL" -C "$WORKDIR" "${NAME}-${VERSION}"
 
-# Copy static spec file
+# Copy .spec file
 cp "packaging/${NAME}.spec" "$TOPDIR/SPECS/"
 
 # Build RPM
 rpmbuild -ba "$TOPDIR/SPECS/${NAME}.spec" \
   --define "ver $VERSION"
 
-# Copy built RPM to release folder
+# Collect output
 FINAL_RPM=$(find "$TOPDIR/RPMS" -type f -name "*.rpm" | head -n1)
-RELEASE_PATH="release/${NAME}-${VERSION}.x86_64.rpm"
+
+# Clean and copy to release
+[ -e release ] && [ ! -d release ] && rm release
 mkdir -p release
+RELEASE_PATH="release/${NAME}-${VERSION}.x86_64.rpm"
 cp "$FINAL_RPM" "$RELEASE_PATH"
 
 echo "🎉 RPM created: $RELEASE_PATH"
