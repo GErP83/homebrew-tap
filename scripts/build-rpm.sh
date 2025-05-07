@@ -1,39 +1,48 @@
 #!/bin/bash
-# Usage: ./build-rpm.sh <NAME> <VERSION>
+# Usage: ./build-rpm.sh <VERSION>
 
 set -e
 
-NAME="$1"
-VERSION="$2"
-TARBALL="${NAME}-${VERSION}.tar.gz"
-TOPDIR="$HOME/rpmbuild"
+VERSION="$1"
+NAME="toucan"
 
-if [ -z "$NAME" ] || [ -z "$VERSION" ]; then
-  echo "Usage: $0 <NAME> <VERSION>"
+if [ -z "$VERSION" ]; then
+  echo "Usage: $0 <VERSION>"
   exit 1
 fi
 
-echo "==> RPM Build Script"
-echo "Package: $NAME"
-echo "Version: $VERSION"
+TARBALL="${NAME}-${VERSION}.tar.gz"
+TOPDIR="$HOME/rpmbuild"
+BIN_DIR=".build/release"
 
-echo "==> Setting up RPM directories"
+echo "📦 Building RPM for $NAME version $VERSION"
+swift build -c release
+
 mkdir -p "$TOPDIR"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-
 WORKDIR=$(mktemp -d)
-cp -R . "$WORKDIR/${NAME}-${VERSION}"
-rm -rf "$WORKDIR/${NAME}-${VERSION}/.git" "$WORKDIR/${NAME}-${VERSION}/.build"
+trap rm -rf "$WORKDIR" EXIT
 
-echo "==> Creating source tarball"
+APP_ROOT="$WORKDIR/${NAME}-${VERSION}/usr/lib/$NAME"
+mkdir -p "$APP_ROOT"
+
+EXECUTABLES=$(find -L "$BIN_DIR" -type f -perm -111)
+if [ -z "$EXECUTABLES" ]; then
+  echo "❌ No executables found in $BIN_DIR"
+  exit 1
+fi
+
+for BIN in $EXECUTABLES; do
+  BASENAME=$(basename "$BIN")
+  cp "$BIN" "$APP_ROOT/$BASENAME"
+  chmod +x "$APP_ROOT/$BASENAME"
+  echo "✅ Added $BASENAME"
+done
+
 tar -czf "$TOPDIR/SOURCES/$TARBALL" -C "$WORKDIR" "${NAME}-${VERSION}"
 
-echo "==> Copying spec file"
 cp "packaging/${NAME}.spec" "$TOPDIR/SPECS/"
+rpmbuild -ba "$TOPDIR/SPECS/${NAME}.spec" \
+  --define "ver $VERSION"
 
-echo "==> Running rpmbuild"
-rpmbuild -ba "$TOPDIR/SPECS/${NAME}.spec"
-
-echo "==> Cleaning up temp"
-rm -rf "$WORKDIR"
-
-echo "==> RPM built successfully"
+echo "🎉 RPM built. Files:"
+find "$TOPDIR/RPMS" -type f -name "*.rpm"
