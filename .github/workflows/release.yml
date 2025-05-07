@@ -7,7 +7,7 @@ on:
       - '[0-9]*'
 
 jobs:
-  build-linux:
+  linux-binaries:
     runs-on: ubuntu-latest
     container:
       image: swift:6.0 
@@ -61,9 +61,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
 
-  build-macos:
+  macos-binaries:
     runs-on: macos-latest
-    needs: build-linux
     permissions:
       contents: write
 
@@ -85,7 +84,7 @@ jobs:
         run: |
           curl -L https://download.swift.org/swift-6.0-release/xcode/swift-6.0-RELEASE/swift-6.0-RELEASE-osx.pkg -o swift.pkg
           sudo installer -pkg swift.pkg -target /
-          export PATH="/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin:$PATH"
+          echo "/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin" >> $GITHUB_PATH
           swift --version
     
       - name: Build binary with Swift 6.0
@@ -95,18 +94,8 @@ jobs:
           
       - name: Create .pkg installer
         run: |
-          mkdir -p pkg-root/usr/local/bin
-          cp .build/release/testify pkg-root/usr/local/bin/
-          mkdir -p release
-          mkdir -p release
-          pkgbuild \
-            --identifier com.example.$NAME \
-            --version "$VERSION" \
-            --install-location /usr/local/bin \
-            --root pkg-root \
-            "release/$NAME-$VERSION.pkg"
-          echo "Contents of release/:"
-          ls -lh release
+          chmod +x scripts/build-pkg.sh
+          ./scripts/build-pkg.sh $NAME $VERSION
 
       - name: Upload .pkg to release
         uses: AButler/upload-release-assets@v3.0
