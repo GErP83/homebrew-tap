@@ -49,7 +49,8 @@ tar -czf "$TOPDIR/SOURCES/$TARBALL" -C "$WORKDIR" "${NAME}-${VERSION}"
 cp "packaging/${NAME}.spec" "$TOPDIR/SPECS/"
 
 # Build RPM
-rpmbuild -ba "$TOPDIR/SPECS/${NAME}.spec"
+rpmbuild -ba "$TOPDIR/SPECS/${NAME}.spec" \
+  --define "ver $VERSION"
 
 # Copy built RPM to release folder
 FINAL_RPM=$(find "$TOPDIR/RPMS" -type f -name "*.rpm" | head -n1)
