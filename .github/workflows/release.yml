@@ -40,18 +40,13 @@ jobs:
       - name: Build DEB
         run: ./scripts/build-deb.sh $VERSION
 
-      - name: Collect packages
-        run: |
-          mkdir release
-          cp ~/rpmbuild/RPMS/**/*.rpm release/
-          cp build-deb/*.deb release/
-
       - name: Collect and verify packages
         run: |
+          [ -e release ] && [ ! -d release ] && rm release
           mkdir -p release
           cp ~/rpmbuild/RPMS/**/*.rpm release/ || echo "No RPMs found"
           cp build-deb/*.deb release/ || echo "No DEBs found"
-          echo "Contents of release dir:"
+          echo "📦 Contents of release dir:"
           ls -lh release
 
       - name: Upload assets to release
@@ -95,7 +90,7 @@ jobs:
       - name: Create .pkg installer
         run: |
           chmod +x scripts/build-pkg.sh
-          ./scripts/build-pkg.sh $NAME $VERSION
+          ./scripts/build-pkg.sh $VERSION
 
       - name: Upload .pkg to release
         uses: AButler/upload-release-assets@v3.0

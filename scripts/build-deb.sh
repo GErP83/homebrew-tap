@@ -48,6 +48,6 @@ Priority: optional
 EOF
 
 dpkg-deb --build "$PKG_ROOT"
-FINAL_DEB="${BUILD_DIR}/${NAME}-${VERSION}.deb"
+FINAL_DEB="${BUILD_DIR}/${NAME}-${VERSION}.amd64.deb"
 mv "$PKG_ROOT.deb" "$FINAL_DEB"
 echo "🎉 Package created at: $FINAL_DEB"
