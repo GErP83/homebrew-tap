@@ -20,7 +20,7 @@ swift build -c release
 
 mkdir -p "$TOPDIR"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 WORKDIR=$(mktemp -d)
-trap rm -rf "$WORKDIR" EXIT
+trap 'rm -rf "$WORKDIR"' EXIT
 
 APP_ROOT="$WORKDIR/${NAME}-${VERSION}/usr/lib/$NAME"
 mkdir -p "$APP_ROOT"
