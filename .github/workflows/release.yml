@@ -14,9 +14,6 @@ jobs:
     permissions:
       contents: write
 
-    env:
-      NAME: test
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,9 +73,6 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
-
-    env:
-      NAME: test
 
     steps:
       - name: Checkout code
