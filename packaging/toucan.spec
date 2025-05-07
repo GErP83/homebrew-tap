@@ -26,8 +26,8 @@ cp -a usr/local/bin/* %{buildroot}/usr/local/bin/
 /usr/local/bin/*
 %dir /usr/local/bin
 
-%license LICENSE
-%doc README.md
+#%license LICENSE
+#%doc README.md
 
 %changelog
 * Mon May 05 2025 Developer <dev@example.com> - %{ver}-%{ver}
